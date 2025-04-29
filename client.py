@@ -4,28 +4,39 @@ API_URL = "http://localhost:8000"
 
 # Client Functions
 
-def create_user(name: str, email: str, contact: str):
-    response = httpx.post(f"{API_URL}/users/", json={"name": name, "email": email, "contact": contact})
+def login(email: str, password: str) -> str:
+    response = httpx.post(f"{API_URL}/token", data={"username": email, "password": password})
+    if response.status_code == 200:
+        token = response.json()["access_token"]
+        print("Login successful.")
+        return token
+    else:
+        raise Exception(f"Login failed: {response.text}")
+
+def create_user(name: str, email: str, contact: str, password: str):
+    response = httpx.post(f"{API_URL}/users/", json={"name": name, "email": email, "contact": contact, "password": password})
     if response.status_code == 200:
         print("User created:", response.json())
     else:
         print("Error creating user:", response.text)
 
-def get_users():
-    response = httpx.get(f"{API_URL}/users/")
+def get_users(token: str):
+    headers = {"Authorization": f"Bearer {token}"}
+    response = httpx.get(f"{API_URL}/users/", headers=headers)
     if response.status_code == 200:
         print("Users:", response.json())
     else:
         print("Error fetching users:", response.text)
 
-def get_user(user_id: int):
-    response = httpx.get(f"{API_URL}/users/{user_id}")
+def get_user(user_id: int, token: str):
+    headers = {"Authorization": f"Bearer {token}"}
+    response = httpx.get(f"{API_URL}/users/{user_id}", headers=headers)
     if response.status_code == 200:
         print("User:", response.json())
     else:
         print("Error fetching user:", response.text)
 
-def update_user(user_id: int, name: str = None, email: str = None, contact: str = None):
+def update_user(user_id: int, token: str, name: str = None, email: str = None, contact: str = None):
     data = {}
     if name:
         data["name"] = name
@@ -34,14 +45,16 @@ def update_user(user_id: int, name: str = None, email: str = None, contact: str 
     if contact:
         data["contact"] = contact
 
-    response = httpx.put(f"{API_URL}/users/{user_id}", json=data)
+    headers = {"Authorization": f"Bearer {token}"}
+    response = httpx.put(f"{API_URL}/users/{user_id}", json=data, headers=headers)
     if response.status_code == 200:
         print("User updated:", response.json())
     else:
         print("Error updating user:", response.text)
 
-def delete_user(user_id: int):
-    response = httpx.delete(f"{API_URL}/users/{user_id}")
+def delete_user(user_id: int, token: str):
+    headers = {"Authorization": f"Bearer {token}"}
+    response = httpx.delete(f"{API_URL}/users/{user_id}", headers=headers)
     if response.status_code == 200:
         print("User deleted")
     else:
@@ -49,15 +62,16 @@ def delete_user(user_id: int):
 
 # Example Usage
 if __name__ == "__main__":
-    create_user("Alice", "alice@example.com","12345")
-    create_user("Bob", "bob@example.com","67890")
+    #create_user("Jay", "Jay@example.com","12345","pass1234")
+    token = login("Jay@example.com", "pass1234")
+    create_user("Bob", "bob@example.com","67890", token)
 
-    get_users()
+    get_users(token)
 
-    get_user(1)
+    get_user(1, token)
 
-    update_user(1, name="Alice Updated")
+    update_user(1,token, name="jay")
 
-    delete_user(2)
+    delete_user(2, token)
 
-    get_users()
+    get_users(token)
