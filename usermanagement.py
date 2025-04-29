@@ -1,3 +1,6 @@
+# Install needed packages first:
+# pip install fastapi uvicorn sqlalchemy pymysql
+
 from fastapi import FastAPI, HTTPException, Depends
 from sqlalchemy import Column, Integer, String, create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base, Session
@@ -17,16 +20,19 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(50), nullable=False)
     email = Column(String(100), unique=True, index=True, nullable=False)
+    contact = Column(String(50), nullable=True)
 
 # Pydantic Schemas
 class UserCreate(BaseModel):
     name: str
     email: str
+    contact: str
 
 class UserRead(BaseModel):
     id: int
     name: str
     email: str
+    contact: str
 
     class Config:
         orm_mode = True
@@ -34,6 +40,7 @@ class UserRead(BaseModel):
 class UserUpdate(BaseModel):
     name: str | None = None
     email: str | None = None
+    contact: str | None = None
 
 # Create tables
 Base.metadata.create_all(bind=engine)
@@ -53,7 +60,7 @@ def get_db():
 # Routes
 @app.post("/users/", response_model=UserRead)
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
-    db_user = User(name=user.name, email=user.email)
+    db_user = User(name=user.name, email=user.email, contact=user.contact)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
@@ -81,6 +88,8 @@ def update_user(user_id: int, user_update: UserUpdate, db: Session = Depends(get
         user.name = user_update.name
     if user_update.email is not None:
         user.email = user_update.email
+    if user_update.contact is not None:
+        user.contact = user_update.contact
 
     db.commit()
     db.refresh(user)
