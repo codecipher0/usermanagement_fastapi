@@ -63,3 +63,16 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
     db.delete(user)
     db.commit()
     return {"detail": "User deleted"}
+    
+@router.post("/comment/", response_model=schemas.CommentRead)
+def add_comment(comment: schemas.CommentCreate, db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
+    db_comment = models.Comments(user_id=current_user.id, comment=comment.comment)
+    db.add(db_comment)
+    db.commit()
+    db.refresh(db_comment)
+    return db_comment
+    
+@router.get("/comment/", response_model=list[schemas.CommentRead])
+def read_comments(db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
+    comments = db.query(models.Comments).all()
+    return comments

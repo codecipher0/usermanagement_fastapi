@@ -9,3 +9,18 @@ class User(Base):
     email = Column(String(100), unique=True, index=True, nullable=False)
     contact = Column(String(50), nullable=True)
     hashed_password = Column(String(100), nullable=False)
+    
+class Comments(Base):
+    __tablename__ = "comments"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, index=True, nullable=False)
+    comment = Column(String(100), nullable=False)
+    
+class Replies(Base):
+    __tablename__ = "replies"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, index=True, nullable=False)
+    original_comment_id = Column(Integer, index=True, nullable=False)
+    reply = Column(String(100), nullable=False)

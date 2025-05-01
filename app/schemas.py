@@ -25,3 +25,13 @@ class UserUpdate(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
+    
+class CommentCreate(BaseModel):
+    comment: str
+    
+class CommentRead(BaseModel):
+    id: int
+    comment: str
+    
+    class Config:
+        orm_mode = True
