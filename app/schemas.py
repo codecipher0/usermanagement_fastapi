@@ -31,7 +31,13 @@ class CommentCreate(BaseModel):
     
 class CommentRead(BaseModel):
     id: int
+    user_id: int
+    original_comment_id: int
     comment: str
     
     class Config:
         orm_mode = True
+        
+class ReplyCreate(BaseModel):
+    original_comment_id: int
+    reply: str

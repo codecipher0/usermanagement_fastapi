@@ -76,3 +76,17 @@ def add_comment(comment: schemas.CommentCreate, db: Session = Depends(get_db), c
 def read_comments(db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
     comments = db.query(models.Comments).all()
     return comments
+    
+@router.get("/comment/{comment_id}", response_model=list[schemas.CommentRead])
+def read_comment(comment_id: int, db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
+    comments = db.query(models.Comments).filter((models.Comments.id == comment_id) | (models.Comments.original_comment_id == comment_id)).all()
+    return comments    
+    
+@router.post("/reply/", response_model=schemas.CommentRead)
+def add_reply(reply: schemas.ReplyCreate, db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
+    db_reply = models.Comments(user_id=current_user.id, original_comment_id=reply.original_comment_id, comment=reply.reply)
+    db.add(db_reply)
+    db.commit()
+    db.refresh(db_reply)
+    return db_reply
+

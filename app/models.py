@@ -15,12 +15,5 @@ class Comments(Base):
     
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, index=True, nullable=False)
+    original_comment_id = Column(Integer, index=True, default=0)
     comment = Column(String(100), nullable=False)
-    
-class Replies(Base):
-    __tablename__ = "replies"
-    
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, index=True, nullable=False)
-    original_comment_id = Column(Integer, index=True, nullable=False)
-    reply = Column(String(100), nullable=False)
