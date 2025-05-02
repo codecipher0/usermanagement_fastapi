@@ -59,19 +59,64 @@ def delete_user(user_id: int, token: str):
         print("User deleted")
     else:
         print("Error deleting user:", response.text)
+        
+def add_comment(comment: str, token:str):
+    headers = {"Authorization": f"Bearer {token}"}
+    response = httpx.post(f"{API_URL}/comment/", json={"comment": comment}, headers=headers)
+    if response.status_code == 200:
+        print("Comment added:", response.json())
+    else:
+        print("Error adding comment:", response.text)
+        
+def get_comments(token: str):
+    headers = {"Authorization": f"Bearer {token}"}
+    response = httpx.get(f"{API_URL}/comment/", headers=headers)
+    if response.status_code == 200:
+        print("Comments:", response.json())
+    else:
+        print("Error fetching comments:", response.text)
+        
+def add_reply(reply: str, original_comment_id: int, token:str):
+    headers = {"Authorization": f"Bearer {token}"}
+    response = httpx.post(f"{API_URL}/reply/", json={"reply": reply, "original_comment_id": original_comment_id}, headers=headers)
+    if response.status_code == 200:
+        print("Comment added:", response.json())
+    else:
+        print("Error adding comment:", response.text)
+        
+def get_comment(comment_id: int, token: str):
+    headers = {"Authorization": f"Bearer {token}"}
+    response = httpx.get(f"{API_URL}/comment/{comment_id}", headers=headers)
+    if response.status_code == 200:
+        print("Comments:", response.json())
+    else:
+        print("Error fetching comments:", response.text)
 
 # Example Usage
 if __name__ == "__main__":
+    #uncomment to create initial user
     #create_user("Jay", "Jay@example.com","12345","pass1234")
-    token = login("Jay@example.com", "pass1234")
-    create_user("Bob", "bob@example.com","67890", token)
+    #create_user("Jas", "Jas@example.com","67890","pass6789")
+    token = login("Jas@example.com", "pass6789")
+    #create_user("Bob", "bob@example.com","67890", token)
 
     get_users(token)
+    
+    #add_comment("Bye!", token)
+    
+    get_comments(token)
+    
+    add_reply("Wazup!",1,token)
+    add_reply("Afternoon!",1,token)
+    
+    get_comment(1, token)
 
-    get_user(1, token)
+    #get_user(1, token)
 
-    update_user(1,token, name="jay")
+    #update_user(1,token, name="jay")
 
-    delete_user(2, token)
+    #delete_user(2, token)
 
-    get_users(token)
+    #get_users(token)
+    
+    
