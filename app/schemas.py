@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import Optional, List
 
 # Pydantic Schemas
 class UserCreate(BaseModel):
@@ -28,16 +29,20 @@ class Token(BaseModel):
     
 class CommentCreate(BaseModel):
     comment: str
+    parent_id: Optional[int] = None
     
 class CommentRead(BaseModel):
     id: int
     user_id: int
-    original_comment_id: int
+    parent_id: Optional[int] = None
     comment: str
+    replies: Optional[List['CommentRead']] = []
     
     class Config:
         orm_mode = True
         
 class ReplyCreate(BaseModel):
-    original_comment_id: int
+    parent_id: int
     reply: str
+    
+CommentRead.update_forward_refs()

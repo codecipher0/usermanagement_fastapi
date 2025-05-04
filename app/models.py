@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, ForeignKey, Text
+from sqlalchemy.orm import relationship
 from .database import Base
 
 class User(Base):
@@ -9,11 +10,15 @@ class User(Base):
     email = Column(String(100), unique=True, index=True, nullable=False)
     contact = Column(String(50), nullable=True)
     hashed_password = Column(String(100), nullable=False)
+    comments = relationship("Comment", back_populates="user")
     
-class Comments(Base):
+class Comment(Base):
     __tablename__ = "comments"
     
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, index=True, nullable=False)
-    original_comment_id = Column(Integer, index=True, default=0)
-    comment = Column(String(100), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    parent_id = Column(Integer, ForeignKey("comments.id"), nullable=True)
+    comment = Column(Text, nullable=False)
+    
+    user = relationship("User", back_populates="comments")
+    replies = relationship("Comment", backref="parent", remote_side=[id])

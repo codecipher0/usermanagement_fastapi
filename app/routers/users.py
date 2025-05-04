@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm
 from .. import models, schemas, auth
@@ -64,27 +64,30 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"detail": "User deleted"}
     
-@router.post("/comment/", response_model=schemas.CommentRead)
+@router.post("/comments/", response_model=schemas.CommentRead)
 def add_comment(comment: schemas.CommentCreate, db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
-    db_comment = models.Comments(user_id=current_user.id, comment=comment.comment)
+    db_comment = models.Comment(user_id=current_user.id, comment=comment.comment, parent_id=comment.parent_id)
     db.add(db_comment)
     db.commit()
     db.refresh(db_comment)
     return db_comment
     
-@router.get("/comment/", response_model=list[schemas.CommentRead])
-def read_comments(db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
-    comments = db.query(models.Comments).all()
+@router.get("/comments/", response_model=list[schemas.CommentRead])
+def read_comments(skip: int = Query(0, ge=0), limit: int = Query(10, gt=0), db: Session = Depends(get_db)):
+    comments = db.query(models.Comment).filter(models.Comment.parent_id == None).offset(skip).limit(limit).all()
     return comments
     
-@router.get("/comment/{comment_id}", response_model=list[schemas.CommentRead])
-def read_comment(comment_id: int, db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
-    comments = db.query(models.Comments).filter((models.Comments.id == comment_id) | (models.Comments.original_comment_id == comment_id)).all()
+@router.get("/comments/{comment_id}", response_model=list[schemas.CommentRead])
+def read_comment(comment_id: int, skip: int = Query(0, ge=0), limit: int = Query(10, gt=0), db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
+    #comments = db.query(models.Comments).filter((models.Comments.id == comment_id) | (models.Comments.original_comment_id == comment_id)).all()
+    comments = db.query(models.Comment).filter((models.Comment.id == comment_id) | (models.Comment.parent_id == comment_id)).offset(skip).limit(limit).all()
+    if not comments:
+        raise HTTPException(status_code=404, detail="Comment not found")
     return comments    
     
 @router.post("/reply/", response_model=schemas.CommentRead)
 def add_reply(reply: schemas.ReplyCreate, db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
-    db_reply = models.Comments(user_id=current_user.id, original_comment_id=reply.original_comment_id, comment=reply.reply)
+    db_reply = models.Comment(user_id=current_user.id, parent_id=reply.parent_id, comment=reply.reply)
     db.add(db_reply)
     db.commit()
     db.refresh(db_reply)
