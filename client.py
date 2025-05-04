@@ -62,54 +62,91 @@ def delete_user(user_id: int, token: str):
         
 def add_comment(comment: str, token:str):
     headers = {"Authorization": f"Bearer {token}"}
-    response = httpx.post(f"{API_URL}/comment/", json={"comment": comment}, headers=headers)
+    response = httpx.post(f"{API_URL}/comments/", json={"comment": comment}, headers=headers)
     if response.status_code == 200:
         print("Comment added:", response.json())
     else:
         print("Error adding comment:", response.text)
         
-def get_comments(token: str):
+def get_comments(token: str, skip: int=0, limit: int = 5):
     headers = {"Authorization": f"Bearer {token}"}
-    response = httpx.get(f"{API_URL}/comment/", headers=headers)
+    #response = httpx.get(f"{API_URL}/comment/", headers=headers)
+    response = httpx.get(f"{API_URL}/comments/?skip={skip}&limit={limit}")
     if response.status_code == 200:
         print("Comments:", response.json())
     else:
         print("Error fetching comments:", response.text)
         
-def add_reply(reply: str, original_comment_id: int, token:str):
+def add_reply(reply: str, parent_id: int, token:str):
     headers = {"Authorization": f"Bearer {token}"}
-    response = httpx.post(f"{API_URL}/reply/", json={"reply": reply, "original_comment_id": original_comment_id}, headers=headers)
+    response = httpx.post(f"{API_URL}/comments/", json={"comment": reply, "parent_id": parent_id}, headers=headers)
     if response.status_code == 200:
         print("Comment added:", response.json())
     else:
         print("Error adding comment:", response.text)
         
-def get_comment(comment_id: int, token: str):
+def get_comment(token: str, comment_id: int, skip: int=0, limit: int = 5):
     headers = {"Authorization": f"Bearer {token}"}
-    response = httpx.get(f"{API_URL}/comment/{comment_id}", headers=headers)
+    response = httpx.get(f"{API_URL}/comments/{comment_id}?skip={skip}&limit={limit}", headers=headers)
     if response.status_code == 200:
         print("Comments:", response.json())
     else:
         print("Error fetching comments:", response.text)
+        
+def delete_comment(comment_id: int, token: str):
+    headers = {"Authorization": f"Bearer {token}"}
+    response = httpx.delete(f"{API_URL}/comments/{comment_id}", headers=headers)
+    if response.status_code == 200:
+        print("Comment deleted")
+    else:
+        print("Error deleting comment:", response.text)
 
 # Example Usage
 if __name__ == "__main__":
     #uncomment to create initial user
     #create_user("Jay", "Jay@example.com","12345","pass1234")
+    #token = login("Jay@example.com", "pass1234")
     #create_user("Jas", "Jas@example.com","67890","pass6789")
     token = login("Jas@example.com", "pass6789")
     #create_user("Bob", "bob@example.com","67890", token)
 
     get_users(token)
     
-    #add_comment("Bye!", token)
+    #add_comment("Hello!", token)
+    #add_comment("How are you!", token)
+    #add_comment("Konnichiwa!", token)
+    #add_comment("Ohayou!", token)
+    #add_comment("Kamusta!", token)
+    
+    #add_comment("comment6!", token)
+    #add_comment("comment7!", token)
+    #add_comment("comment8!", token)
+    #add_comment("comment9!", token)
+    #add_comment("comment10!", token)
+    
+    #add_comment("comment11!", token)
+    #add_comment("comment12!", token)
+    #add_comment("comment13!", token)
+    #add_comment("comment14!", token)
+    #add_comment("comment15!", token)
+    
+    #add_reply("reply1", 1, token)
+    #add_reply("reply2", 3, token)
+    #add_reply("reply3", 3, token)
+    #token = login("Jas@example.com", "pass6789")
+    #add_reply("reply4", 3, token)
+    
+    #get_comments(token)
+    #get_comment(token,1)
     
     get_comments(token)
+    delete_comment(9, token)
+    get_comments(token)
     
-    add_reply("Wazup!",1,token)
-    add_reply("Afternoon!",1,token)
+    #add_reply("Wazup!",1,token)
+    #add_reply("Afternoon!",1,token)
     
-    get_comment(1, token)
+    #get_comment(1, token)
 
     #get_user(1, token)
 

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Text
+from sqlalchemy import Column, Integer, String, ForeignKey, Text, Boolean
 from sqlalchemy.orm import relationship
 from .database import Base
 
@@ -10,6 +10,7 @@ class User(Base):
     email = Column(String(100), unique=True, index=True, nullable=False)
     contact = Column(String(50), nullable=True)
     hashed_password = Column(String(100), nullable=False)
+    is_deleted = Column(Boolean, default=False)
     comments = relationship("Comment", back_populates="user")
     
 class Comment(Base):
@@ -19,6 +20,8 @@ class Comment(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     parent_id = Column(Integer, ForeignKey("comments.id"), nullable=True)
     comment = Column(Text, nullable=False)
+    is_deleted = Column(Boolean, default=False)
     
     user = relationship("User", back_populates="comments")
-    replies = relationship("Comment", backref="parent", remote_side=[id])
+    replies = relationship("Comment", back_populates="children")
+    children = relationship("Comment", back_populates="replies", remote_side=[id])    
