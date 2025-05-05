@@ -11,17 +11,16 @@ class User(Base):
     contact = Column(String(50), nullable=True)
     hashed_password = Column(String(100), nullable=False)
     is_deleted = Column(Boolean, default=False)
-    comments = relationship("Comment", back_populates="user")
     
 class Comment(Base):
     __tablename__ = "comments"
     
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    user_id = Column(Integer, nullable=False)
     parent_id = Column(Integer, ForeignKey("comments.id"), nullable=True)
     comment = Column(Text, nullable=False)
     is_deleted = Column(Boolean, default=False)
     
-    user = relationship("User", back_populates="comments")
-    replies = relationship("Comment", back_populates="children")
-    children = relationship("Comment", back_populates="replies", remote_side=[id])    
+    #user = relationship("User", back_populates="comments")
+    #replies = relationship("Comment", back_populates="children")
+    #children = relationship("Comment", back_populates="replies", remote_side=[id])    

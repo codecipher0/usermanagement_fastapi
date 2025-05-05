@@ -90,9 +90,9 @@ def read_comments(skip: int = Query(0, ge=0), limit: int = Query(10, gt=0), db: 
     return [build_comment_tree(comment, db) for comment in comments]
     
 @router.get("/comments/{comment_id}", response_model=schemas.CommentRead)
-def read_comment(comment_id: int, skip: int = Query(0, ge=0), limit: int = Query(10, gt=0), db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
+def read_comment(comment_id: int, db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
     #comments = db.query(models.Comment).filter((models.Comment.id == comment_id) | (models.Comment.parent_id == comment_id)).offset(skip).limit(limit).all()
-    comment = db.query(models.Comment).filter(models.Comment.id == comment_id, models.Comment.is_deleted == False).offset(skip).limit(limit).first()
+    comment = db.query(models.Comment).filter(models.Comment.id == comment_id, models.Comment.is_deleted == False).first()
     if not comment:
         raise HTTPException(status_code=404, detail="Comment not found")
     #return comments
