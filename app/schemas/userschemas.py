@@ -1,7 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Optional, List, ForwardRef
-
-#CommentReadRef = ForwardRef("CommentRead")
+from typing import Optional, List
 
 # Pydantic Schemas
 class UserCreate(BaseModel):
@@ -29,20 +27,4 @@ class Token(BaseModel):
     access_token: str
     token_type: str
     
-class CommentCreate(BaseModel):
-    comment: str
-    parent_id: Optional[int] = None
-    
-class CommentRead(BaseModel):
-    id: int
-    user_id: int
-    comment: str
-    parent_id: Optional[int] = None
-    replies: List['CommentRead'] = []
-    #replies: List[CommentReadRef] = Field(default_factory=list)
-    
-    class Config:
-        orm_mode = True
-
-CommentRead.update_forward_refs()
     

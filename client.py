@@ -85,9 +85,9 @@ def add_reply(reply: str, parent_id: int, token:str):
     else:
         print("Error adding comment:", response.text)
         
-def get_comment(token: str, comment_id: int, skip: int=0, limit: int = 5):
+def get_comment(token: str, comment_id: int):
     headers = {"Authorization": f"Bearer {token}"}
-    response = httpx.get(f"{API_URL}/comments/{comment_id}?skip={skip}&limit={limit}", headers=headers)
+    response = httpx.get(f"{API_URL}/comments/{comment_id}", headers=headers)
     if response.status_code == 200:
         print("Comments:", response.json())
     else:
@@ -140,8 +140,9 @@ if __name__ == "__main__":
     #get_comment(token,1)
     
     get_comments(token)
-    delete_comment(9, token)
-    get_comments(token)
+    #delete_comment(9, token)
+    print("-----------")
+    get_comment(token, 3)
     
     #add_reply("Wazup!",1,token)
     #add_reply("Afternoon!",1,token)
