@@ -5,8 +5,8 @@ from sqlalchemy.orm import sessionmaker, declarative_base, Session
 import bcrypt
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
-from .database import get_db
-from .models import User
+from ..core.database import get_db
+from ..models.models import User
 
 # Security settings
 SECRET_KEY = "your_secret_key"

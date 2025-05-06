@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm
-from .. import models, auth
+from ..models import models
+from ..core import auth
 from ..schemas import commentschemas
-from ..database import get_db
+from ..core.database import get_db
 
 comment_router = APIRouter()
     

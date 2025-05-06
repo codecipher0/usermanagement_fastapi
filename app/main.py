@@ -1,6 +1,6 @@
 from fastapi import FastAPI
-from .database import Base, engine
-from . import models
+from .core.database import Base, engine
+from .models import models
 from .routers.users import router
 from .routers.comments import comment_router
 
