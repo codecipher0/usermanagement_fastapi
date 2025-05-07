@@ -5,7 +5,7 @@ API_URL = "http://localhost:8000"
 # Client Functions
 
 def login(email: str, password: str) -> str:
-    response = httpx.post(f"{API_URL}/token", data={"username": email, "password": password})
+    response = httpx.post(f"{API_URL}/api/users/token", data={"username": email, "password": password})
     if response.status_code == 200:
         token = response.json()["access_token"]
         print("Login successful.")
@@ -14,7 +14,7 @@ def login(email: str, password: str) -> str:
         raise Exception(f"Login failed: {response.text}")
 
 def create_user(name: str, email: str, contact: str, password: str):
-    response = httpx.post(f"{API_URL}/users/", json={"name": name, "email": email, "contact": contact, "password": password})
+    response = httpx.post(f"{API_URL}/api/users/", json={"name": name, "email": email, "contact": contact, "password": password})
     if response.status_code == 200:
         print("User created:", response.json())
     else:
@@ -22,7 +22,7 @@ def create_user(name: str, email: str, contact: str, password: str):
 
 def get_users(token: str):
     headers = {"Authorization": f"Bearer {token}"}
-    response = httpx.get(f"{API_URL}/users/", headers=headers)
+    response = httpx.get(f"{API_URL}/api/users/", headers=headers)
     if response.status_code == 200:
         print("Users:", response.json())
     else:
@@ -30,7 +30,7 @@ def get_users(token: str):
 
 def get_user(user_id: int, token: str):
     headers = {"Authorization": f"Bearer {token}"}
-    response = httpx.get(f"{API_URL}/users/{user_id}", headers=headers)
+    response = httpx.get(f"{API_URL}/api/users/{user_id}", headers=headers)
     if response.status_code == 200:
         print("User:", response.json())
     else:
@@ -71,7 +71,7 @@ def add_comment(comment: str, token:str):
 def get_comments(token: str, skip: int=0, limit: int = 5):
     headers = {"Authorization": f"Bearer {token}"}
     #response = httpx.get(f"{API_URL}/comment/", headers=headers)
-    response = httpx.get(f"{API_URL}/comments/?skip={skip}&limit={limit}")
+    response = httpx.get(f"{API_URL}/api/comments/?skip={skip}&limit={limit}")
     if response.status_code == 200:
         print("Comments:", response.json())
     else:
@@ -87,7 +87,7 @@ def add_reply(reply: str, parent_id: int, token:str):
         
 def get_comment(token: str, comment_id: int):
     headers = {"Authorization": f"Bearer {token}"}
-    response = httpx.get(f"{API_URL}/comments/{comment_id}", headers=headers)
+    response = httpx.get(f"{API_URL}/api/comments/{comment_id}", headers=headers)
     if response.status_code == 200:
         print("Comments:", response.json())
     else:

@@ -16,7 +16,7 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db:
     access_token = auth.create_access_token(data={"sub": str(user.id)})
     return {"access_token": access_token, "token_type": "bearer"}
 
-@router.post("/users/", response_model=userschemas.UserRead)
+@router.post("/", response_model=userschemas.UserRead)
 def create_user(user: userschemas.UserCreate, db: Session = Depends(get_db)):
     hashed_password = auth.get_password_hash(user.password)
     db_user = models.User(name=user.name, email=user.email, contact=user.contact, hashed_password=hashed_password)
@@ -25,19 +25,19 @@ def create_user(user: userschemas.UserCreate, db: Session = Depends(get_db)):
     db.refresh(db_user)
     return db_user
 
-@router.get("/users/", response_model=list[userschemas.UserRead])
+@router.get("/", response_model=list[userschemas.UserRead])
 def read_users(db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
     users = db.query(models.User).filter(models.User.is_deleted == False).all()
     return users
 
-@router.get("/users/{user_id}", response_model=userschemas.UserRead)
+@router.get("/{user_id}", response_model=userschemas.UserRead)
 def read_user(user_id: int, db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
     user = db.query(models.User).filter(models.User.id == user_id, models.User.is_deleted == False).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
-@router.put("/users/{user_id}", response_model=userschemas.UserRead)
+@router.put("/{user_id}", response_model=userschemas.UserRead)
 def update_user(user_id: int, user_update: userschemas.UserUpdate, db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
     user = db.query(models.User).filter(models.User.id == user_id, models.User.is_deleted == False).first()
     if not user:
@@ -57,7 +57,7 @@ def update_user(user_id: int, user_update: userschemas.UserUpdate, db: Session =
     db.refresh(user)
     return user
 
-@router.delete("/users/{user_id}")
+@router.delete("/{user_id}")
 def delete_user(user_id: int, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.id == user_id, models.User.is_deleted == False).first()
     if not user:
