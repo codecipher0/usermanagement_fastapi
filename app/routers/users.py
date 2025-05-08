@@ -5,12 +5,15 @@ from ..models import models
 from ..core import auth
 from ..schemas import userschemas
 from ..core.database import get_db
+from ..controllers.usercontroller import UserController
 
 router = APIRouter()
 
 @router.post("/token", response_model=userschemas.Token)
 def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    user = db.query(models.User).filter(models.User.email == form_data.username, models.User.is_deleted == False).first()
+    #user = db.query(models.User).filter(models.User.email == form_data.username, models.User.is_deleted == False).first()
+    user_ctrl = UserController(db)
+    user = user_ctrl.get_user_by_email(email=form_data.username)
     if not user or not auth.verify_password(form_data.password, user.hashed_password):
         raise HTTPException(status_code=400, detail="Incorrect email or password")
     access_token = auth.create_access_token(data={"sub": str(user.id)})
@@ -18,51 +21,28 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db:
 
 @router.post("/", response_model=userschemas.UserRead)
 def create_user(user: userschemas.UserCreate, db: Session = Depends(get_db)):
-    hashed_password = auth.get_password_hash(user.password)
-    db_user = models.User(name=user.name, email=user.email, contact=user.contact, hashed_password=hashed_password)
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
+    user_ctrl = UserController(db)
+    db_user = user_ctrl.create_user(user)
     return db_user
 
 @router.get("/", response_model=list[userschemas.UserRead])
-def read_users(db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
-    users = db.query(models.User).filter(models.User.is_deleted == False).all()
-    return users
+def read_users(skip: int = 0, limit: int = 10, db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
+    user_ctrl = UserController(db)
+    return user_ctrl.get_users(skip=skip, limit=limit)
 
 @router.get("/{user_id}", response_model=userschemas.UserRead)
 def read_user(user_id: int, db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
-    user = db.query(models.User).filter(models.User.id == user_id, models.User.is_deleted == False).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+    user_ctrl = UserController(db)
+    user = user_ctrl.get_user_by_id(user_id)
     return user
 
 @router.put("/{user_id}", response_model=userschemas.UserRead)
 def update_user(user_id: int, user_update: userschemas.UserUpdate, db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
-    user = db.query(models.User).filter(models.User.id == user_id, models.User.is_deleted == False).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-
-    if user_update.name is not None:
-        user.name = user_update.name
-    if user_update.email is not None:
-        user.email = user_update.email
-    if user_update.contact is not None:
-        user.contact = user_update.contact
-    if user_update.password is not None:
-        user.hashed_password = auth.get_password_hash(user_update.password)
-
-
-    db.commit()
-    db.refresh(user)
+    user_ctrl = UserController(db)
+    user = user_ctrl.update_user(user_id, user_update)
     return user
 
 @router.delete("/{user_id}")
 def delete_user(user_id: int, db: Session = Depends(get_db)):
-    user = db.query(models.User).filter(models.User.id == user_id, models.User.is_deleted == False).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    #db.delete(user)
-    user.is_deleted = True
-    db.commit()
+    user_ctrl = UserController(db)
     return {"detail": "User deleted"}

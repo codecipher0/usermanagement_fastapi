@@ -46,7 +46,7 @@ def update_user(user_id: int, token: str, name: str = None, email: str = None, c
         data["contact"] = contact
 
     headers = {"Authorization": f"Bearer {token}"}
-    response = httpx.put(f"{API_URL}/users/{user_id}", json=data, headers=headers)
+    response = httpx.put(f"{API_URL}/api/users/{user_id}", json=data, headers=headers)
     if response.status_code == 200:
         print("User updated:", response.json())
     else:
@@ -54,7 +54,7 @@ def update_user(user_id: int, token: str, name: str = None, email: str = None, c
 
 def delete_user(user_id: int, token: str):
     headers = {"Authorization": f"Bearer {token}"}
-    response = httpx.delete(f"{API_URL}/users/{user_id}", headers=headers)
+    response = httpx.delete(f"{API_URL}/api/users/{user_id}", headers=headers)
     if response.status_code == 200:
         print("User deleted")
     else:
@@ -62,7 +62,7 @@ def delete_user(user_id: int, token: str):
         
 def add_comment(comment: str, token:str):
     headers = {"Authorization": f"Bearer {token}"}
-    response = httpx.post(f"{API_URL}/comments/", json={"comment": comment}, headers=headers)
+    response = httpx.post(f"{API_URL}/api/comments/", json={"comment": comment}, headers=headers)
     if response.status_code == 200:
         print("Comment added:", response.json())
     else:
@@ -79,7 +79,7 @@ def get_comments(token: str, skip: int=0, limit: int = 5):
         
 def add_reply(reply: str, parent_id: int, token:str):
     headers = {"Authorization": f"Bearer {token}"}
-    response = httpx.post(f"{API_URL}/comments/", json={"comment": reply, "parent_id": parent_id}, headers=headers)
+    response = httpx.post(f"{API_URL}/api/comments/", json={"comment": reply, "parent_id": parent_id}, headers=headers)
     if response.status_code == 200:
         print("Comment added:", response.json())
     else:
@@ -95,7 +95,7 @@ def get_comment(token: str, comment_id: int):
         
 def delete_comment(comment_id: int, token: str):
     headers = {"Authorization": f"Bearer {token}"}
-    response = httpx.delete(f"{API_URL}/comments/{comment_id}", headers=headers)
+    response = httpx.delete(f"{API_URL}/api/comments/{comment_id}", headers=headers)
     if response.status_code == 200:
         print("Comment deleted")
     else:
@@ -107,10 +107,12 @@ if __name__ == "__main__":
     #create_user("Jay", "Jay@example.com","12345","pass1234")
     #token = login("Jay@example.com", "pass1234")
     #create_user("Jas", "Jas@example.com","67890","pass6789")
-    token = login("Jas@example.com", "pass6789")
-    #create_user("Bob", "bob@example.com","67890", token)
+    #token = login("Jas@example.com", "pass6789")
+    #create_user("Bob", "bob@example.com","67890", "pass6789")
+    token = login("bob@example.com", "pass6789")
 
     get_users(token)
+    add_comment("Bwahaha!", token)
     
     #add_comment("Hello!", token)
     #add_comment("How are you!", token)
@@ -130,7 +132,7 @@ if __name__ == "__main__":
     #add_comment("comment14!", token)
     #add_comment("comment15!", token)
     
-    #add_reply("reply1", 1, token)
+    add_reply("reply1", 1, token)
     #add_reply("reply2", 3, token)
     #add_reply("reply3", 3, token)
     #token = login("Jas@example.com", "pass6789")
