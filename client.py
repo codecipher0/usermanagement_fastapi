@@ -101,6 +101,13 @@ def delete_comment(comment_id: int, token: str):
     else:
         print("Error deleting comment:", response.text)
 
+def get_comments_by_userid(token: str, user_id: int, skip: int=0, limit: int = 10):
+    headers = {"Authorization": f"Bearer {token}"}
+    response = httpx.get(f"{API_URL}/api/comments/user/{user_id}", headers=headers)
+    if response.status_code == 200:
+        print("Comments:", response.json())
+    else:
+        print("Error fetching comments:", response.text)
 # Example Usage
 if __name__ == "__main__":
     #uncomment to create initial user
@@ -112,7 +119,7 @@ if __name__ == "__main__":
     token = login("bob@example.com", "pass6789")
 
     get_users(token)
-    add_comment("Bwahaha!", token)
+    #add_comment("Bwahaha!", token)
     
     #add_comment("Hello!", token)
     #add_comment("How are you!", token)
@@ -132,7 +139,7 @@ if __name__ == "__main__":
     #add_comment("comment14!", token)
     #add_comment("comment15!", token)
     
-    add_reply("reply1", 1, token)
+    #add_reply("reply1", 1, token)
     #add_reply("reply2", 3, token)
     #add_reply("reply3", 3, token)
     #token = login("Jas@example.com", "pass6789")
@@ -145,6 +152,9 @@ if __name__ == "__main__":
     #delete_comment(9, token)
     print("-----------")
     get_comment(token, 3)
+    print("-----------")
+    get_comments_by_userid(token, 1)
+    
     
     #add_reply("Wazup!",1,token)
     #add_reply("Afternoon!",1,token)

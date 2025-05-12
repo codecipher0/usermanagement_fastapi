@@ -36,3 +36,6 @@ class CommentController(BaseController):
         comment = self.get_comment_by_id(comment_id)
         self.delete(comment)
         return comment
+        
+    def get_comments_by_user_id(self, user_id: int, skip: int = 0, limit: int = 10) -> List[models.Comment]:
+        return self.db.query(models.Comment).filter(models.Comment.user_id == user_id, models.Comment.is_deleted == False).offset(skip).limit(limit).all()

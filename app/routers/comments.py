@@ -31,3 +31,8 @@ def delete_comment(comment_id: int, db: Session = Depends(get_db), current_user:
     comment_ctrl = CommentController(db)
     comment_ctrl.delete_comment(comment_id)
     return {"detail": "Comment deleted"}
+
+@router.get("/user/{user_id}", response_model=list[commentschemas.CommentRead])
+def list_comments_by_user(user_id: int, skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
+    comments = CommentController(db).get_comments_by_user_id(user_id, skip, limit)
+    return [CommentController(db).build_comment_tree(comment) for comment in comments]
