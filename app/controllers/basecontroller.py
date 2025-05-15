@@ -25,3 +25,10 @@ class BaseController:
         else:
             self.db.delete(instance)
         self.db.commit()
+        
+    def update(self, instance: T, update_data: dict) -> T:
+        for key, value in update_data.items():
+            setattr(instance, key, value)
+        self.db.commit()
+        self.db.refresh(instance)
+        return instance

@@ -22,22 +22,8 @@ class UserController(BaseController):
     
     def update_user(self, user_id: int, user_update: userschemas.UserUpdate):
         user = self.get_user_by_id(user_id)
-        if not user:
-            raise HTTPException(status_code=404, detail="User not found")
-            
-        if user_update.name is not None:
-            user.name = user_update.name
-        if user_update.email is not None:
-            user.email = user_update.email
-        if user_update.contact is not None:
-            user.contact = user_update.contact
-        if user_update.password is not None:
-            user.hashed_password = auth.get_password_hash(user_update.password)
-            
-        self.db.commit()
-        self.db.refresh(user)
-        
-        return user
+        update_data = user_update.dict(exclude_unset=True)
+        return self.update(user, update_data)
         
     def delete_user(self, user_id: int):
         user = self.get_user_by_id(user_id)
